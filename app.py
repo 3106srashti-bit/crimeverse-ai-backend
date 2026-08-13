@@ -20,6 +20,11 @@ df_property = load_dataset(
 )
 
 
+df_rape_victims = load_dataset(
+    "20_Victims_of_rape.csv"
+)
+
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -193,6 +198,28 @@ def property_trend():
             "year": str(int(row["Year"])),
             "stolen": int(row["Cases_Property_Stolen"]),
             "recovered": int(row["Cases_Property_Recovered"])
+        })
+
+    return jsonify(data)
+
+@app.route("/rape-victims-trend")
+def rape_victims_trend():
+
+    yearly = (
+        df_rape_victims[
+            df_rape_victims["Subgroup"] == "Total Rape Victims"
+        ]
+        .groupby("Year")["Victims_of_Rape_Total"]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "victims": int(row["Victims_of_Rape_Total"])
         })
 
     return jsonify(data)
