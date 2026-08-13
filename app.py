@@ -48,6 +48,10 @@ df_murder_victims = load_dataset(
     "32_Murder_victim_age_sex.csv"
 )
 
+df_non_murder_victims = load_dataset(
+    "33_CH_not_murder_victim_age_sex.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -397,6 +401,26 @@ def murder_victim_trend():
         data.append({
             "year": str(int(row["Year"])),
             "group": str(row["Group_Name"]),
+            "victims": int(row["Victims_Total"])
+        })
+
+    return jsonify(data)
+
+@app.route("/non-murder-victim-trend")
+def non_murder_victim_trend():
+
+    yearly = (
+        df_non_murder_victims.groupby(["Year", "Sub_Group_Name"])["Victims_Total"]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "group": str(row["Sub_Group_Name"]),
             "victims": int(row["Victims_Total"])
         })
 
