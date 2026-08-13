@@ -32,6 +32,9 @@ df_violent_trials = load_dataset(
     "28_Trial_of_violent_crimes_by_courts.csv"
 )
 
+df_trial_period = load_dataset(
+    "29_Period_of_trials_by_courts.csv"
+)
 
 @app.route("/")
 def home():
@@ -270,6 +273,39 @@ def violent_trials_trend():
         data.append({
             "year": str(int(row["Year"])),
             "trials": int(row["Trial_of_Violent_Crimes_by_Courts_Total"])
+        })
+
+    return jsonify(data)
+
+@app.route("/trial-period-trend")
+def trial_period_trend():
+
+    yearly = (
+        df_trial_period.groupby("Year")[
+            [
+                "PT_Less_than_6_Months",
+                "PT_6_12_Months",
+                "PT_1_3_Years",
+                "PT_3_5_Years",
+                "PT_5_10_Years",
+                "PT_Over_10_Years"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "less_than_6_months": int(row["PT_Less_than_6_Months"]),
+            "six_to_12_months": int(row["PT_6_12_Months"]),
+            "one_to_3_years": int(row["PT_1_3_Years"]),
+            "three_to_5_years": int(row["PT_3_5_Years"]),
+            "five_to_10_years": int(row["PT_5_10_Years"]),
+            "over_10_years": int(row["PT_Over_10_Years"])
         })
 
     return jsonify(data)
