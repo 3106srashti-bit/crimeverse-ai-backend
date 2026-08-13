@@ -36,6 +36,10 @@ df_trial_period = load_dataset(
     "29_Period_of_trials_by_courts.csv"
 )
 
+df_auto_theft = load_dataset(
+    "30_Auto_theft.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -306,6 +310,33 @@ def trial_period_trend():
             "three_to_5_years": int(row["PT_3_5_Years"]),
             "five_to_10_years": int(row["PT_5_10_Years"]),
             "over_10_years": int(row["PT_Over_10_Years"])
+        })
+
+    return jsonify(data)
+
+@app.route("/auto-theft-trend")
+def auto_theft_trend():
+
+    yearly = (
+        df_auto_theft.groupby("Year")[
+            [
+                "Auto_Theft_Stolen",
+                "Auto_Theft_Recovered",
+                "Auto_Theft_Coordinated/Traced"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "stolen": int(row["Auto_Theft_Stolen"]),
+            "recovered": int(row["Auto_Theft_Recovered"]),
+            "traced": int(row["Auto_Theft_Coordinated/Traced"])
         })
 
     return jsonify(data)
