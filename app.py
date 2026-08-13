@@ -40,6 +40,10 @@ df_auto_theft = load_dataset(
     "30_Auto_theft.csv"
 )
 
+df_serious_fraud = load_dataset(
+    "31_Serious_fraud.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -337,6 +341,38 @@ def auto_theft_trend():
             "stolen": int(row["Auto_Theft_Stolen"]),
             "recovered": int(row["Auto_Theft_Recovered"]),
             "traced": int(row["Auto_Theft_Coordinated/Traced"])
+        })
+
+    return jsonify(data)
+
+
+@app.route("/serious-fraud-trend")
+def serious_fraud_trend():
+
+    yearly = (
+        df_serious_fraud.groupby("Year")[
+            [
+                "Loss_of_Property_1_10_Crores",
+                "Loss_of_Property_10_25_Crores",
+                "Loss_of_Property_25_50_Crores",
+                "Loss_of_Property_50_100_Crores",
+                "Loss_of_Property_Above_100_Crores"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "one_to_10_crores": int(row["Loss_of_Property_1_10_Crores"]),
+            "ten_to_25_crores": int(row["Loss_of_Property_10_25_Crores"]),
+            "twentyfive_to_50_crores": int(row["Loss_of_Property_25_50_Crores"]),
+            "fifty_to_100_crores": int(row["Loss_of_Property_50_100_Crores"]),
+            "above_100_crores": int(row["Loss_of_Property_Above_100_Crores"])
         })
 
     return jsonify(data)
