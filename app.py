@@ -15,6 +15,10 @@ df_arrests = load_dataset(
     "43_Arrests_under_crime_against_women.csv"
 )
 
+df_property = load_dataset(
+    "10_Property_stolen_and_recovered.csv"
+)
+
 
 @app.route("/")
 def home():
@@ -166,6 +170,29 @@ def arrests_trend():
         data.append({
             "year": str(int(row["Year"])),
             "arrests": int(row["Persons_Arrested"])
+        })
+
+    return jsonify(data)
+
+
+@app.route("/property-trend")
+def property_trend():
+
+    yearly = (
+        df_property.groupby("Year")[
+            ["Cases_Property_Stolen", "Cases_Property_Recovered"]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "stolen": int(row["Cases_Property_Stolen"]),
+            "recovered": int(row["Cases_Property_Recovered"])
         })
 
     return jsonify(data)
