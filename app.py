@@ -28,6 +28,10 @@ df_police_complaints = load_dataset(
     "25_Complaints_against_police.csv"
 )
 
+df_violent_trials = load_dataset(
+    "28_Trial_of_violent_crimes_by_courts.csv"
+)
+
 
 @app.route("/")
 def home():
@@ -248,6 +252,28 @@ def police_complaints_trend():
         })
 
     return jsonify(data)
+
+@app.route("/violent-trials-trend")
+def violent_trials_trend():
+
+    yearly = (
+        df_violent_trials.groupby("Year")[
+            "Trial_of_Violent_Crimes_by_Courts_Total"
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "trials": int(row["Trial_of_Violent_Crimes_by_Courts_Total"])
+        })
+
+    return jsonify(data)
+
 
 
 if __name__ == "__main__":
