@@ -44,6 +44,10 @@ df_serious_fraud = load_dataset(
     "31_Serious_fraud.csv"
 )
 
+df_murder_victims = load_dataset(
+    "32_Murder_victim_age_sex.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -373,6 +377,27 @@ def serious_fraud_trend():
             "twentyfive_to_50_crores": int(row["Loss_of_Property_25_50_Crores"]),
             "fifty_to_100_crores": int(row["Loss_of_Property_50_100_Crores"]),
             "above_100_crores": int(row["Loss_of_Property_Above_100_Crores"])
+        })
+
+    return jsonify(data)
+
+
+@app.route("/murder-victim-trend")
+def murder_victim_trend():
+
+    yearly = (
+        df_murder_victims.groupby(["Year", "Group_Name"])["Victims_Total"]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "group": str(row["Group_Name"]),
+            "victims": int(row["Victims_Total"])
         })
 
     return jsonify(data)
