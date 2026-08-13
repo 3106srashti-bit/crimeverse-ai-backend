@@ -1,15 +1,19 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import pandas as pd
+from dataset_loader import load_dataset
 import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Load dataset
-DATASET_PATH = "../crimeverse-data/dataset/cleaned/crime_cleaned.csv"
+df = load_dataset(
+    "42_cases_under_crime_against_women.csv"
+)
 
-df = pd.read_csv(DATASET_PATH)
+df_arrests = load_dataset(
+    "43_Arrests_under_crime_against_women.csv"
+)
 
 
 @app.route("/")
@@ -146,6 +150,25 @@ def ai_insight():
         ),
         "confidence": 96
     })
+
+@app.route("/arrests-trend")
+def arrests_trend():
+
+    yearly = (
+        df_arrests.groupby("Year")["Persons_Arrested"]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "arrests": int(row["Persons_Arrested"])
+        })
+
+    return jsonify(data)
 
 
 if __name__ == "__main__":
