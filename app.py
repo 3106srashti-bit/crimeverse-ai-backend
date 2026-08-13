@@ -24,6 +24,10 @@ df_rape_victims = load_dataset(
     "20_Victims_of_rape.csv"
 )
 
+df_police_complaints = load_dataset(
+    "25_Complaints_against_police.csv"
+)
+
 
 @app.route("/")
 def home():
@@ -220,6 +224,27 @@ def rape_victims_trend():
         data.append({
             "year": str(int(row["Year"])),
             "victims": int(row["Victims_of_Rape_Total"])
+        })
+
+    return jsonify(data)
+
+@app.route("/police-complaints-trend")
+def police_complaints_trend():
+
+    yearly = (
+        df_police_complaints.groupby("Year")[
+            "CPA_-_Complaints_Received/Alleged"
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "complaints": int(row["CPA_-_Complaints_Received/Alleged"])
         })
 
     return jsonify(data)
