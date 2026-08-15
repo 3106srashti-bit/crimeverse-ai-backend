@@ -52,6 +52,10 @@ df_non_murder_victims = load_dataset(
     "33_CH_not_murder_victim_age_sex.csv"
 )
 
+df_human_rights = load_dataset(
+    "35_Human_rights_violation_by_police.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -422,6 +426,34 @@ def non_murder_victim_trend():
             "year": str(int(row["Year"])),
             "group": str(row["Sub_Group_Name"]),
             "victims": int(row["Victims_Total"])
+        })
+
+    return jsonify(data)
+
+
+@app.route("/human-rights-trend")
+def human_rights_trend():
+
+    yearly = (
+        df_human_rights.groupby("Year")[
+            [
+                "Cases_Registered_under_Human_Rights_Violations",
+                "Policemen_Chargesheeted",
+                "Policemen_Convicted"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "cases_registered": int(row["Cases_Registered_under_Human_Rights_Violations"]),
+            "chargesheeted": int(row["Policemen_Chargesheeted"]),
+            "convicted": int(row["Policemen_Convicted"])
         })
 
     return jsonify(data)
