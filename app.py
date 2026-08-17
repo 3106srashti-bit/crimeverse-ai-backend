@@ -56,6 +56,14 @@ df_human_rights = load_dataset(
     "35_Human_rights_violation_by_police.csv"
 )
 
+df_police_housing = load_dataset(
+    "36_Police_housing.csv"
+)
+
+df_police_housing = load_dataset(
+    "36_Police_housing.csv"
+)
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -458,7 +466,55 @@ def human_rights_trend():
 
     return jsonify(data)
 
+@app.route("/police-housing-trend")
+def police_housing_trend():
 
+    yearly = (
+        df_police_housing.groupby("Year")[
+            [
+                "PH_Houses_Provided_by_Department",
+                "PH_Houses_provided_on_LeaseRentGPRA",
+                "PH_Sanctioned_Strength"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "houses_provided": int(row["PH_Houses_Provided_by_Department"]),
+            "houses_on_lease": int(row["PH_Houses_provided_on_LeaseRentGPRA"]),
+            "sanctioned_strength": int(row["PH_Sanctioned_Strength"])
+        })
+
+    return jsonify(data)
+
+@app.route("/kidnapping-purpose-trend")
+def kidnapping_purpose_trend():
+
+    yearly = (
+        df_kidnapping_purpose.groupby(
+            ["Year", "Group_Name"]
+        )["K_A_Grand_Total"]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+
+        data.append({
+            "year": str(int(row["Year"])),
+            "purpose": str(row["Group_Name"]),
+            "cases": int(row["K_A_Grand_Total"])
+        })
+
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(debug=True)
