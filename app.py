@@ -72,6 +72,21 @@ df_custodial_death = pd.read_csv(
     "data/datasets/40_01_custodial_death_person_remanded.csv"
 )
 
+df_custodial_death_not_remanded = pd.read_csv(
+    "data/datasets/40_02_custodial_death_person_not_remanded.csv"
+)
+
+df_custodial_death_production = pd.read_csv(
+    "data/datasets/40_03_custodial_death_during_production.csv"
+)
+
+df_custodial_death_hospital = pd.read_csv(
+    "data/datasets/40_04_custodial_death_during_hospitalization_or_treatment.csv"
+)
+
+df_custodial_death_others = pd.read_csv(
+    "data/datasets/40_05_custodial_death_others.csv"
+)
 
 
 
@@ -588,6 +603,131 @@ def custodial_death_trend():
             "magisterial_enquiries": int(row["CD_No_of_Magisterial_enquiry_orderedconducted"]),
             "policemen_charge_sheeted": int(row["CD_No_of_Policemen_Charge_sheeted"]),
             "policemen_convicted": int(row["CD_No_of_Policemen_Convicted"])
+        })
+
+    return jsonify(data)
+
+@app.route("/custodial-death-not-remanded-trend")
+def custodial_death_not_remanded_trend():
+
+    yearly = (
+        df_custodial_death_not_remanded.groupby("Year")[
+            [
+                "CD_Deaths_Reported",
+                "CD_No_of_Autopsy_conducted",
+                "CD_No_of_Cases_registered_in_connection_with_deaths",
+                "CD_No_of_Judicial_enquiry_orderedconducted",
+                "CD_No_of_Magisterial_enquiry_orderedconducted",
+                "CD_No_of_Policemen_Charge_sheeted",
+                "CD_No_of_Policemen_Convicted"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "deaths_reported": int(row["CD_Deaths_Reported"]),
+            "autopsies_conducted": int(row["CD_No_of_Autopsy_conducted"]),
+            "cases_registered": int(row["CD_No_of_Cases_registered_in_connection_with_deaths"]),
+            "judicial_enquiries": int(row["CD_No_of_Judicial_enquiry_orderedconducted"]),
+            "magisterial_enquiries": int(row["CD_No_of_Magisterial_enquiry_orderedconducted"]),
+            "policemen_charge_sheeted": int(row["CD_No_of_Policemen_Charge_sheeted"]),
+            "policemen_convicted": int(row["CD_No_of_Policemen_Convicted"])
+        })
+
+    return jsonify(data)
+
+
+@app.route("/custodial-death-production-trend")
+def custodial_death_production_trend():
+
+    yearly = (
+        df_custodial_death_production.groupby("Year")[
+            [
+                "CD_Deaths_Reported",
+                "CD_No_of_Autopsy_conducted",
+                "CD_No_of_Cases_registered_in_connection_with_deaths",
+                "CD_No_of_Judicial_enquiry_orderedconducted",
+                "CD_No_of_Magisterial_enquiry_orderedconducted",
+                "CD_No_of_Policemen_Charge_sheeted",
+                "CD_No_of_Policemen_Convicted"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "deaths_reported": int(row["CD_Deaths_Reported"]),
+            "autopsies_conducted": int(row["CD_No_of_Autopsy_conducted"]),
+            "cases_registered": int(row["CD_No_of_Cases_registered_in_connection_with_deaths"]),
+            "judicial_enquiries": int(row["CD_No_of_Judicial_enquiry_orderedconducted"]),
+            "magisterial_enquiries": int(row["CD_No_of_Magisterial_enquiry_orderedconducted"]),
+            "policemen_charge_sheeted": int(row["CD_No_of_Policemen_Charge_sheeted"]),
+            "policemen_convicted": int(row["CD_No_of_Policemen_Convicted"])
+        })
+
+    return jsonify(data)
+
+@app.route("/custodial-death-hospitalization-trend")
+def custodial_death_hospitalization_trend():
+
+    yearly = (
+        df_custodial_death_hospital.groupby("Year")[
+            ["CD_Hospitalisation_Treatment"]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "hospitalisation_treatment": int(row["CD_Hospitalisation_Treatment"])
+        })
+
+    return jsonify(data)
+
+@app.route("/custodial-death-other-causes-trend")
+def custodial_death_other_causes_trend():
+
+    yearly = (
+        df_custodial_death_others.groupby("Year")[
+            [
+                "CD_Accidents",
+                "CD_By_Mob_AttackRiots",
+                "CD_By_other_Criminals",
+                "CD_By_Suicide",
+                "CD_IllnessNatural_Death",
+                "CD_While_Escaping_from_Custody"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "accidents": int(row["CD_Accidents"]),
+            "mob_attack_riots": int(row["CD_By_Mob_AttackRiots"]),
+            "other_criminals": int(row["CD_By_other_Criminals"]),
+            "suicide": int(row["CD_By_Suicide"]),
+            "illness_natural_death": int(row["CD_IllnessNatural_Death"]),
+            "escaping_from_custody": int(row["CD_While_Escaping_from_Custody"])
         })
 
     return jsonify(data)
