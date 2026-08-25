@@ -68,6 +68,12 @@ df_kidnapping = pd.read_csv(
     "data/datasets/39_Specific_purpose_of_kidnapping_and_abduction.csv"
 )
 
+df_custodial_death = pd.read_csv(
+    "data/datasets/40_01_custodial_death_person_remanded.csv"
+)
+
+
+
 
 
 @app.route("/")
@@ -547,6 +553,41 @@ def kidnapping_abduction_trend():
             "female_total": int(row["K_A_Female_Total"]),
             "male_total": int(row["K_A_Male_Total"]),
             "grand_total": int(row["K_A_Grand_Total"])
+        })
+
+    return jsonify(data)
+
+@app.route("/custodial-death-trend")
+def custodial_death_trend():
+
+    yearly = (
+        df_custodial_death.groupby("Year")[
+            [
+                "CD_Deaths_Reported",
+                "CD_No_of_Autopsy_conducted",
+                "CD_No_of_Cases_registered_in_connection_with_deaths",
+                "CD_No_of_Judicial_enquiry_orderedconducted",
+                "CD_No_of_Magisterial_enquiry_orderedconducted",
+                "CD_No_of_Policemen_Charge_sheeted",
+                "CD_No_of_Policemen_Convicted"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "deaths_reported": int(row["CD_Deaths_Reported"]),
+            "autopsies_conducted": int(row["CD_No_of_Autopsy_conducted"]),
+            "cases_registered": int(row["CD_No_of_Cases_registered_in_connection_with_deaths"]),
+            "judicial_enquiries": int(row["CD_No_of_Judicial_enquiry_orderedconducted"]),
+            "magisterial_enquiries": int(row["CD_No_of_Magisterial_enquiry_orderedconducted"]),
+            "policemen_charge_sheeted": int(row["CD_No_of_Policemen_Charge_sheeted"]),
+            "policemen_convicted": int(row["CD_No_of_Policemen_Convicted"])
         })
 
     return jsonify(data)
