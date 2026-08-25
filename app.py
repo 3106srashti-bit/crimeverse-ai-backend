@@ -64,6 +64,12 @@ df_police_housing = load_dataset(
     "36_Police_housing.csv"
 )
 
+df_kidnapping = pd.read_csv(
+    "data/datasets/39_Specific_purpose_of_kidnapping_and_abduction.csv"
+)
+
+
+
 @app.route("/")
 def home():
     return "CrimeVerse Backend Running!"
@@ -515,6 +521,37 @@ def kidnapping_purpose_trend():
         })
 
     return jsonify(data)
+
+@app.route("/kidnapping-abduction-trend")
+def kidnapping_abduction_trend():
+
+    yearly = (
+        df_kidnapping.groupby("Year")[
+            [
+                "K_A_Cases_Reported",
+                "K_A_Female_Total",
+                "K_A_Male_Total",
+                "K_A_Grand_Total"
+            ]
+        ]
+        .sum()
+        .reset_index()
+    )
+
+    data = []
+
+    for _, row in yearly.iterrows():
+        data.append({
+            "year": str(int(row["Year"])),
+            "cases_reported": int(row["K_A_Cases_Reported"]),
+            "female_total": int(row["K_A_Female_Total"]),
+            "male_total": int(row["K_A_Male_Total"]),
+            "grand_total": int(row["K_A_Grand_Total"])
+        })
+
+    return jsonify(data)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
